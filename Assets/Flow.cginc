@@ -1,8 +1,18 @@
 #if !defined(FLOW_INCLUDED)
 #define FLOW_INCLUDED
 
-float2 FlowUV (float2 uv, float2 flowVector, float time) {
-    return uv - flowVector * frac(time);
+float3 FlowUVW (float2 uv, float2 flowVector, float2 jump, float time, bool sampleB) 
+{
+    float phaseOffset = sampleB ? 0.5 : 0;
+    float progress = frac(time + phaseOffset);
+    
+    float3 uvw;
+    uvw.xy = uv + flowVector * progress + phaseOffset;
+    uvw.xy += (time - progress) * jump;
+    uvw.z = 1 - abs(1 - 2 * progress);
+    return uvw;
+    
+    //bugged why uvs increase forever?
 }
 
 #endif
